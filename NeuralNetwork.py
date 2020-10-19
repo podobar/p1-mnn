@@ -1,17 +1,7 @@
 import numpy as np
 import math
 import csv
-
-
-def load_csv(filename):
-    with open(filename, newline='') as f:
-        reader = csv.reader(f)
-        _data = list(reader)
-
-    for index in range(1, len(_data)):
-        _data[index] = [float(item) for item in _data[index]]
-
-    return _data
+from Activation import Activation
 
 
 class NeuralNetwork:
@@ -24,13 +14,13 @@ class NeuralNetwork:
     def __init__(self, n, sizes):
 
         for i in range(len(sizes)-1):
-            weights = np.random.rand(sizes[i+1], sizes[i])
+            weights = np.random.rand(sizes[i+1], sizes[i])*np.sqrt(2/sizes[i])
             self.Weights.append(weights)
 
             bias = np.random.rand(sizes[i+1])
             self.Biases.append(bias)
 
-    def forward_propagation(self, input, activate):
+    def forward_propagation(self, input, inner_activate, out_activate):
         self.Layers.clear()
         self.Layers.append(input)
 
@@ -38,13 +28,14 @@ class NeuralNetwork:
             new_input = self.Weights[i].dot(self.Layers[i])
             np.add(new_input, self.Biases[i])
             for j in range(len(new_input)):
-                new_input[j] = activate(new_input[j]) + (1 if i == len(self.Weights)-1 else 0)
+                f = out_activate if i == len(self.Weights)-1 else inner_activate
+                new_input[j] = f(new_input[j])
             self.Layers.append(new_input)
 
         return self.Layers[-1]
 
-    def back_propagation_error(self, expected, derivative, c):
-        self.Errors.append(c(expected, self.Layers[-1]))
+    def back_propagation_error(self, expected, inner_derivative, out_derivative, cost_gradient):
+        self.Errors.append(cost_gradient(expected, self.Layers[-1]))
 
         for i in range(len(self.Layers)-2, 0, -1):
             errors = list()
@@ -54,6 +45,7 @@ class NeuralNetwork:
                     error += self.Weights[i][k][j] * self.Errors[-1][k]
                 errors.append(error)
             for j in range(len(errors)):
+                derivative = out_derivative if i == len(self.Layers)-2 else inner_derivative
                 errors[j] *= derivative(self.Layers[i][j])
             self.Errors.append(errors)
 
@@ -66,44 +58,6 @@ class NeuralNetwork:
                     self.Weights[i][j][k] += factor * self.Errors[i][j] * self.Layers[i][k]
                 self.Biases[i][j] += factor * self.Errors[i][j]
         self.Errors.clear()
-
-    @staticmethod
-    def sigmoid(x):
-        return math.exp(x)/(math.exp(x) + 1)
-
-    @staticmethod
-    def sigmoid_derivative(y):
-        return y * (1-y)
-
-    @staticmethod
-    def subtract_cost_function(expected, result):
-        return np.subtract(expected, result)
-
-
-if __name__ == "__main__":
-
-    train_data_filename = "classification\\data.simple.train.1000.csv"
-    test_data_filename = "classification\\data.simple.test.1000.csv"
-
-    learning_factor = 1
-    input_size = 2
-    output_size = 1
-
-    data = load_csv(train_data_filename)
-
-    network = NeuralNetwork(3, [input_size, 2, output_size])
-
-    for ind in range(1, len(data)):
-        result = network.forward_propagation(data[ind][0:input_size], NeuralNetwork.sigmoid)
-        network.back_propagation_error(data[ind][input_size:len(data)], NeuralNetwork.sigmoid_derivative,
-                                       NeuralNetwork.subtract_cost_function)
-        network.update_weights(learning_factor)
-
-    test_data = load_csv(test_data_filename)
-
-    for ind in range(1, 10):
-        result = network.forward_propagation(test_data[ind][0:input_size], NeuralNetwork.sigmoid)
-        print("Computed = {} Actual = {} \n".format(result, test_data[ind][input_size:len(data)]))
 
 
 
