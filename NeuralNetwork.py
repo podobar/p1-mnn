@@ -33,20 +33,19 @@ class NeuralNetwork:
         return self.Layers[-1]
 
     def back_propagation_error(self, expected, inner_derivative, out_derivative, cost_gradient):
-        self.Errors.append(cost_gradient(expected, self.Layers[-1]))
+        errors = cost_gradient(expected, self.Layers[-1])
+        errors = np.multiply(errors, out_derivative(self.Layers[-1]))
+        self.Errors.append(errors)
 
         for i in range(len(self.Layers)-2, 0, -1):
             errors = list()
             for j in range(len(self.Layers[i])):
                 error = 0
                 for k in range(len(self.Layers[i+1])):
-                    error += self.Weights[i][k][j] * \
-                             self.Errors[-1][k]
+                    error += self.Weights[i][k][j] * self.Errors[-1][k]
                 errors.append(error)
 
-            derivative = out_derivative if i == len(self.Layers) - 2 else inner_derivative
-            np.multiply(errors, derivative(self.Layers[i]))
-
+            errors = np.multiply(errors, inner_derivative(self.Layers[i]))
             self.Errors.append(errors)
 
         self.Errors.reverse()
@@ -59,7 +58,7 @@ class NeuralNetwork:
                 self.Biases[i][j] += factor * self.Errors[i][j]
         self.Errors.clear()
 
-    def learn(self,input_size, train_set, val_set, inner_activate, out_activate, inner_derivative, out_derivative,
+    def learn(self, input_size, train_set, val_set, inner_activate, out_activate, inner_derivative, out_derivative,
               cost_gradient, loss_function, learn_factor):
 
         bestW = list()

@@ -29,14 +29,26 @@ def classification_evaluate(network: NeuralNetwork, test_data, binary):
     return positives
 
 
+def regression_evaluate(network: NeuralNetwork, test_data):
+    actuals = list()
+    predicted = list()
+    for i in range(len(test_data)):
+        result = network.forward_propagation(test_data[i][0:input_size], activation, out_activation)
+        actual = float(test_data[i][input_size])
+        actuals.append(actual)
+        predicted.append(result)
+    return CostFunctions.MSE(actuals, predicted)
+
+
 if __name__ == "__main__":
 
-    train_data_filename = "classification\\data.three_gauss.train.100.csv"
-    test_data_filename = "classification\\data.three_gauss.test.100.csv"
+    train_data_filename = "classification\\data.three_gauss.train.500.csv"
+    test_data_filename = "classification\\data.three_gauss.test.500.csv"
 
     problem = 1
+    val_set_factor = 0.2
 
-    learning_factor = 0.15
+    learning_factor = 0.1
     input_size = 2
     output_size = 3
     multi_class_fl = (problem == 1) & (output_size > 1)
@@ -48,7 +60,7 @@ if __name__ == "__main__":
     cost_gradient = CostFunctions.MSE_gradient
     loss_function = CostFunctions.MSE
 
-    network = NeuralNetwork(1, [input_size, 7, output_size])
+    network = NeuralNetwork(3, [input_size, 1, output_size])
 
     data = load_csv(train_data_filename)
 
@@ -60,9 +72,11 @@ if __name__ == "__main__":
 
     train_set = list()
     val_set = list()
-    for i in range(1, len(data), 2):
-        train_set.append(data[i])
-        val_set.append((data[i+1]))
+    for i in range(1, len(data)):
+        if i % int(1 / val_set_factor) == 0:
+            val_set.append(data[i])
+        else:
+            train_set.append(data[i])
 
     network.learn(input_size, train_set, val_set, activation, out_activation, derivative, out_derivative,
                   cost_gradient, loss_function, learning_factor)
@@ -82,6 +96,9 @@ if __name__ == "__main__":
         #     print("Precision_"+str(i+1), precisions[i])
         #     print("Recall_" + str(i+1), recalls[i])
 
+    if modes[problem] == "Regression":
+        mean_square_error = regression_evaluate(network, test_data[1:])
 
+        print("Mean square error:", mean_square_error)
 
 

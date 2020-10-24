@@ -15,7 +15,7 @@ class CostFunctions:
     def MSE(n_expected, n_result):
         dtab = list()
         for i in range(len(n_expected)):
-            dtab.append(np.power(np.subtract(n_expected[i], n_result[i]), 2))
+            dtab.append(np.power(np.subtract(n_expected[i], n_result[i]), 2).sum())
         return np.mean(dtab)
 
 
