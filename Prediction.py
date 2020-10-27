@@ -44,6 +44,8 @@ def regression_evaluate(network: NeuralNetwork, test_data):
         actual = float(test_data[i][input_size])
         actuals.append(actual)
         predictions.append(result)
+
+    Visualization.draw_2D_result_plot_regression(predictions, test_data, CostFunctions.MSE(actuals, predictions))
     return CostFunctions.MSE(actuals, predictions)
 
 
@@ -52,12 +54,18 @@ if __name__ == "__main__":
     train_data_filename = "classification\\data.three_gauss.train.500.csv"
     test_data_filename = "classification\\data.three_gauss.test.500.csv"
 
+    train_data_filename = "regression\\data.activation.train.500.csv"
+    test_data_filename = "regression\\data.activation.test.500.csv"
     problem = 1
+    problem = 2
     val_set_factor = 0.2
 
     learning_factor = 0.1
     input_size = 2
+    input_size = 1
     output_size = 3
+    output_size = 1
+
     multi_class_fl = (problem == 1) & (output_size > 1)
 
     activation = Activation.relu
@@ -68,8 +76,8 @@ if __name__ == "__main__":
     loss_function = CostFunctions.MSE
 
     network = NeuralNetwork(3, [input_size, 1, output_size])
+    Visualization.write_out_neural_network_params(network, isInitial=True)
     data = load_csv(train_data_filename)
-    Visualization.draw_2D_plot(data[1:], 'Training data [raw]')
     if multi_class_fl:
         for i in range(1, len(data)):
             class_vector = np.zeros(output_size)
@@ -86,12 +94,12 @@ if __name__ == "__main__":
 
     network.learn(input_size, train_set, val_set, activation, out_activation, derivative, out_derivative,
                   cost_gradient, loss_function, learning_factor)
-    Visualization.drawNeuralNetwork(network, 'Initial weights and biases', isInitial=1)
+    Visualization.write_out_neural_network_params(network)
     logging.info(f"\n=========================\nNetwork trained\n")
     test_data = load_csv(test_data_filename)
 
     if modes[problem] == "Classification":
-
+        Visualization.draw_2D_plot(data[1:], 'Training data [raw]')
         positives = classification_evaluate(network, test_data[1:], output_size == 1)
 
         total_accuracy = positives/(len(test_data)-1)

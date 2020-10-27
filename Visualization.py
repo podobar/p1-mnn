@@ -1,5 +1,4 @@
 import matplotlib.pyplot as plt
-from NeuralNetwork import NeuralNetwork
 
 class Visualization:
 
@@ -22,32 +21,42 @@ class Visualization:
         fig.show()
 
     @staticmethod
+    def draw_2D_result_plot_regression(predictions, test_data, diff):
+        x = [row[0] for row in test_data]
+        y = [row[1] for row in test_data]
+        plt.scatter(x, y, c='black', marker=".", s=1)
+        plt.scatter(x, predictions, c='red', marker=".", s=1)
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title(f'Regression results, MSE:{diff}')
+        plt.show()
+    @staticmethod
     def draw_2D_plot(data, plot_title):
         x = [row[0] for row in data]
         y = [row[1] for row in data]
         colors = [row[2] for row in data]
         plt.scatter(x, y, c=colors, cmap='cool', marker=".")
-        plt.colorbar(label="classification")
+        plt.colorbar(label="cls")
         plt.xlabel('x')
         plt.ylabel('y')
         plt.title(plot_title)
         plt.show()
 
     @staticmethod
-    def draw_neural_network(network, title, isInitial):
-        # _plotCount =
-        # fig, axs = plt.subplots(2*len(network.Biases) + 1)
-        # fig.suptitle(title)
-        # #Input layer
-        # axs[0].plot()
-        # axs[0].title('Input layer weights')
-        # #Hidden layers
-        # for i in range(1, 2*len(network.Biases), 2):
-        #     axs[i].title(f'Hidden layer ({i}) weights ')
-        #     axs[i].title(f'Hidden layer ({i}) biases')
-        #
-        #
-        # #Output layer
-        # axs[len(network.Biases)].title('Output layer weights')
-        # axs[len(network.Biases)].title('Output layer biases')
+    def write_out_neural_network_params(network, isInitial = False):
+        #Input layer
+        print('Input layer weights:')
+        print(network.Weights[0])
+        #Hidden layers
+        for i in range(1, len(network.Biases)):
+            print(f'Hidden layer ({i}) weights: ')
+            print(network.Weights[i])
+            print(f'Hidden layer ({i}) biases: ')
+            print(network.Biases[i-1])
+
+        #Output layer
+        print('Output layer biases')
+        print(network.Biases[len(network.Biases)-1])
+        if(isInitial == False):
+            return
         return
