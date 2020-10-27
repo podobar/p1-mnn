@@ -1,10 +1,14 @@
 from Activation import Activation
 from CostFunctions import CostFunctions
 from NeuralNetwork import NeuralNetwork
+from Visualization import Visualization
 import csv
 import numpy as np
+import logging
+
 
 modes = {1: "Classification", 2: "Regression"}
+log_file_path = "logs\\history.log"
 
 
 def load_csv(filename):
@@ -20,28 +24,31 @@ def load_csv(filename):
 
 def classification_evaluate(network: NeuralNetwork, test_data, binary):
     positives = 0
+    predictions = list()
     for i in range(len(test_data)):
         result = network.forward_propagation(test_data[i][0:input_size], activation, out_activation)
         predicted = (2 if result[0] >= 1.5 else 1) if binary else np.argmax(result) + 1
         actual = int(test_data[i][input_size])
+        predictions.append(predicted)
         if predicted == actual:
             positives += 1
+    Visualization.draw_2D_result_plot_classification(predictions, test_data, positives)
     return positives
 
 
 def regression_evaluate(network: NeuralNetwork, test_data):
     actuals = list()
-    predicted = list()
+    predictions = list()
     for i in range(len(test_data)):
         result = network.forward_propagation(test_data[i][0:input_size], activation, out_activation)
         actual = float(test_data[i][input_size])
         actuals.append(actual)
-        predicted.append(result)
-    return CostFunctions.MSE(actuals, predicted)
+        predictions.append(result)
+    return CostFunctions.MSE(actuals, predictions)
 
 
 if __name__ == "__main__":
-
+    logging.basicConfig(filename=log_file_path, level=logging.INFO)
     train_data_filename = "classification\\data.three_gauss.train.500.csv"
     test_data_filename = "classification\\data.three_gauss.test.500.csv"
 
@@ -61,9 +68,8 @@ if __name__ == "__main__":
     loss_function = CostFunctions.MSE
 
     network = NeuralNetwork(3, [input_size, 1, output_size])
-
     data = load_csv(train_data_filename)
-
+    Visualization.draw_2D_plot(data[1:], 'Training data [raw]')
     if multi_class_fl:
         for i in range(1, len(data)):
             class_vector = np.zeros(output_size)
@@ -80,7 +86,8 @@ if __name__ == "__main__":
 
     network.learn(input_size, train_set, val_set, activation, out_activation, derivative, out_derivative,
                   cost_gradient, loss_function, learning_factor)
-
+    Visualization.drawNeuralNetwork(network, 'Initial weights and biases', isInitial=1)
+    logging.info(f"\n=========================\nNetwork trained\n")
     test_data = load_csv(test_data_filename)
 
     if modes[problem] == "Classification":
