@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import logging
 
 class Visualization:
 
@@ -43,7 +44,20 @@ class Visualization:
         plt.show()
 
     @staticmethod
-    def write_out_neural_network_params(network, isInitial = False):
+    def write_out_neural_network_params(network):
+        # Input layer
+        logging.info('Input layer weights:')
+        logging.info(network.Weights[0])
+        # Hidden layers
+        for i in range(1, len(network.Biases)):
+            logging.info(f'Hidden layer ({i}) weights: ')
+            logging.info(network.Weights[i])
+            logging.info(f'Hidden layer ({i}) biases: ')
+            logging.info(network.Biases[i-1])
+        # Output layer
+        logging.info('Output layer biases')
+        logging.info(network.Biases[len(network.Biases) - 1])
+
         #Input layer
         print('Input layer weights:')
         print(network.Weights[0])
@@ -53,16 +67,22 @@ class Visualization:
             print(network.Weights[i])
             print(f'Hidden layer ({i}) biases: ')
             print(network.Biases[i-1])
-
         #Output layer
         print('Output layer biases')
         print(network.Biases[len(network.Biases)-1])
-        if(isInitial == False):
-            return
         return
 
     @staticmethod
     def write_out_neural_network_weights(network):
+
+        # Input layer
+        logging.info('Input layer weights:')
+        logging.info(network.Weights[0])
+        # Hidden layers
+        for i in range(1, len(network.Weights)):
+            logging.info(f'Hidden layer ({i}) weights: ')
+            logging.info(network.Weights[i])
+
         # Input layer
         print('Input layer weights:')
         print(network.Weights[0])
@@ -72,7 +92,14 @@ class Visualization:
             print(network.Weights[i])
 
     @staticmethod
-    def write_out_neural_network_weight_errors(network):
+    def write_out_neuron_errors(network):
+        # Input layer
+        logging.info('Input layer errors:')
+        logging.info(network.Errors[0])
+        # Hidden layers
+        for i in range(1, len(network.Errors)):
+            logging.info(f'Hidden layer ({i}) errors: ')
+            logging.info(network.Errors[i])
         # Input layer
         print('Input layer errors:')
         print(network.Errors[0])

@@ -2,7 +2,6 @@ import numpy as np
 
 from Visualization import Visualization
 
-
 class NeuralNetwork:
 
     Layers = list()
@@ -51,8 +50,7 @@ class NeuralNetwork:
             self.Errors.append(errors)
 
         self.Errors.reverse()
-        Visualization.write_out_neural_network_weight_errors(self)
-
+        Visualization.write_out_neuron_errors(self)
 
     def update_weights(self, factor):
         for i in range(len(self.Weights)):

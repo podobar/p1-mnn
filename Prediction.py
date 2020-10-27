@@ -6,7 +6,6 @@ import csv
 import numpy as np
 import logging
 
-
 modes = {1: "Classification", 2: "Regression"}
 log_file_path = "logs\\history.log"
 
@@ -51,6 +50,7 @@ def regression_evaluate(network: NeuralNetwork, test_data):
 
 if __name__ == "__main__":
     logging.basicConfig(filename=log_file_path, level=logging.INFO)
+    logging.info('\nProgram started\n')
     train_data_filename = "classification\\data.three_gauss.train.500.csv"
     test_data_filename = "classification\\data.three_gauss.test.500.csv"
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
     loss_function = CostFunctions.MSE
 
     network = NeuralNetwork(3, [input_size, 2, output_size])
-    Visualization.write_out_neural_network_params(network, isInitial=True)
+    Visualization.write_out_neural_network_params(network)
     data = load_csv(train_data_filename)
     if multi_class_fl:
         for i in range(1, len(data)):
