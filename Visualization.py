@@ -60,3 +60,23 @@ class Visualization:
         if(isInitial == False):
             return
         return
+
+    @staticmethod
+    def write_out_neural_network_weights(network):
+        # Input layer
+        print('Input layer weights:')
+        print(network.Weights[0])
+        # Hidden layers
+        for i in range(1, len(network.Weights)):
+            print(f'Hidden layer ({i}) weights: ')
+            print(network.Weights[i])
+
+    @staticmethod
+    def write_out_neural_network_weight_errors(network):
+        # Input layer
+        print('Input layer errors:')
+        print(network.Errors[0])
+        # Hidden layers
+        for i in range(1, len(network.Errors)):
+            print(f'Hidden layer ({i}) errors: ')
+            print(network.Errors[i])

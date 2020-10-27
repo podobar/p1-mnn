@@ -1,5 +1,7 @@
 import numpy as np
 
+from Visualization import Visualization
+
 
 class NeuralNetwork:
 
@@ -49,9 +51,8 @@ class NeuralNetwork:
             self.Errors.append(errors)
 
         self.Errors.reverse()
-        #TODO
-        print("Errors:")
-        print(self.Errors)
+        Visualization.write_out_neural_network_weight_errors(self)
+
 
     def update_weights(self, factor):
         for i in range(len(self.Weights)):
@@ -60,6 +61,7 @@ class NeuralNetwork:
                     self.Weights[i][j][k] += factor * self.Errors[i][j] * self.Layers[i][k]
                 self.Biases[i][j] += factor * self.Errors[i][j]
         self.Errors.clear()
+        Visualization.write_out_neural_network_weights(self)
 
     def learn(self, input_size, train_set, val_set, inner_activate, out_activate, inner_derivative, out_derivative,
               cost_gradient, loss_function, learn_factor):

@@ -54,17 +54,17 @@ if __name__ == "__main__":
     train_data_filename = "classification\\data.three_gauss.train.500.csv"
     test_data_filename = "classification\\data.three_gauss.test.500.csv"
 
-    train_data_filename = "regression\\data.activation.train.500.csv"
-    test_data_filename = "regression\\data.activation.test.500.csv"
+    #train_data_filename = "regression\\data.activation.train.500.csv"
+    #test_data_filename = "regression\\data.activation.test.500.csv"
     problem = 1
-    problem = 2
+    #problem = 2
     val_set_factor = 0.2
 
     learning_factor = 0.1
     input_size = 2
-    input_size = 1
+    #input_size = 1
     output_size = 3
-    output_size = 1
+    #output_size = 1
 
     multi_class_fl = (problem == 1) & (output_size > 1)
 
@@ -75,7 +75,7 @@ if __name__ == "__main__":
     cost_gradient = CostFunctions.MSE_gradient
     loss_function = CostFunctions.MSE
 
-    network = NeuralNetwork(3, [input_size, 1, output_size])
+    network = NeuralNetwork(3, [input_size, 2, output_size])
     Visualization.write_out_neural_network_params(network, isInitial=True)
     data = load_csv(train_data_filename)
     if multi_class_fl:
