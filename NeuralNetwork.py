@@ -49,6 +49,9 @@ class NeuralNetwork:
             self.Errors.append(errors)
 
         self.Errors.reverse()
+        #TODO
+        print("Errors:")
+        print(self.Errors)
 
     def update_weights(self, factor):
         for i in range(len(self.Weights)):

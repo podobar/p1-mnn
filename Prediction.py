@@ -95,7 +95,6 @@ if __name__ == "__main__":
     network.learn(input_size, train_set, val_set, activation, out_activation, derivative, out_derivative,
                   cost_gradient, loss_function, learning_factor)
     Visualization.write_out_neural_network_params(network)
-    logging.info(f"\n=========================\nNetwork trained\n")
     test_data = load_csv(test_data_filename)
 
     if modes[problem] == "Classification":
