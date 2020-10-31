@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import logging
 
+
 class Visualization:
 
     @staticmethod
@@ -19,7 +20,7 @@ class Visualization:
 
         axs[0].scatter(x, y, c=colors_predicted, cmap='cool', marker=".")
         axs[1].scatter(x, y, c=colors_test, cmap='cool', marker=".")
-        fig.show()
+        plt.show()
 
     @staticmethod
     def draw_2D_result_plot_regression(predictions, test_data, diff):
@@ -31,6 +32,7 @@ class Visualization:
         plt.ylabel('y')
         plt.title(f'Regression results, MSE:{diff}')
         plt.show()
+
     @staticmethod
     def draw_2D_plot(data, plot_title):
         x = [row[0] for row in data]
@@ -70,6 +72,7 @@ class Visualization:
         #Output layer
         print('Output layer biases')
         print(network.Biases[len(network.Biases)-1])
+        print("\n\n")
         return
 
     @staticmethod
@@ -90,6 +93,7 @@ class Visualization:
         for i in range(1, len(network.Weights)):
             print(f'Hidden layer ({i}) weights: ')
             print(network.Weights[i])
+        print("\n\n")
 
     @staticmethod
     def write_out_neuron_errors(network):
@@ -107,3 +111,4 @@ class Visualization:
         for i in range(1, len(network.Errors)):
             print(f'Hidden layer ({i}) errors: ')
             print(network.Errors[i])
+        print("\n\n")

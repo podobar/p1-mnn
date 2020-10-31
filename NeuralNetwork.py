@@ -9,7 +9,7 @@ class NeuralNetwork:
     Biases = list()
     Errors = list()
 
-    def __init__(self, n, sizes):
+    def __init__(self, sizes):
 
         for i in range(len(sizes)-1):
             weights = np.random.rand(sizes[i+1], sizes[i])
@@ -50,7 +50,7 @@ class NeuralNetwork:
             self.Errors.append(errors)
 
         self.Errors.reverse()
-        Visualization.write_out_neuron_errors(self)
+        #Visualization.write_out_neuron_errors(self)
 
     def update_weights(self, factor):
         for i in range(len(self.Weights)):
@@ -59,16 +59,17 @@ class NeuralNetwork:
                     self.Weights[i][j][k] += factor * self.Errors[i][j] * self.Layers[i][k]
                 self.Biases[i][j] += factor * self.Errors[i][j]
         self.Errors.clear()
-        Visualization.write_out_neural_network_weights(self)
+        #Visualization.write_out_neural_network_weights(self)
 
     def learn(self, input_size, train_set, val_set, inner_activate, out_activate, inner_derivative, out_derivative,
-              cost_gradient, loss_function, learn_factor):
+              cost_gradient, learn_factor, iterations):
 
         bestW = list()
         bestB = list()
         minloss = -1
 
-        for data in train_set:
+        for i in range(iterations):
+            data = train_set[i]
             self.forward_propagation(data[0:input_size], inner_activate, out_activate)
             self.back_propagation_error(data[input_size:len(data)], inner_derivative, out_derivative, cost_gradient)
             self.update_weights(learn_factor)
@@ -79,14 +80,14 @@ class NeuralNetwork:
                 actual.append(val_data[input_size:len(data)])
                 predicted.append(self.forward_propagation(val_data[0:input_size], inner_activate, out_activate))
 
-            loss = loss_function(actual, predicted)
-            if (minloss == -1) | (minloss > loss):
-                minloss = loss
-                bestW = self.Weights
-                bestB = self.Biases
-
-        self.Weights = bestW
-        self.Biases = bestB
+        #     loss = loss_function(actual, predicted)
+        #     if (minloss == -1) | (minloss > loss):
+        #         minloss = loss
+        #         bestW = self.Weights
+        #         bestB = self.Biases
+        #
+        # self.Weights = bestW
+        # self.Biases = bestB
 
 
 

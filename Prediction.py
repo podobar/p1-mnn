@@ -21,12 +21,42 @@ def load_csv(filename):
     return _data
 
 
-def classification_evaluate(network: NeuralNetwork, test_data, binary):
+def modify_for_multiclass(data, n_class):
+    for i in range(len(data)):
+        class_vector = np.zeros(n_class)
+        class_vector[int(data[i][input_size]) - 1] = 1
+        data[i] = data[i][0:input_size] + list(class_vector)
+    return data
+
+
+def modify_data_for_classification(data, n_class, samples_per_class, have_to_mix):
+    if not have_to_mix:
+        return data
+    data_reordered = list()
+    for i in range(samples_per_class):
+        for j in range(n_class):
+            data_reordered.append(data[i + j * samples_per_class])
+
+    return data_reordered
+
+
+def split_dataset(data, factor):
+    train_set = list()
+    val_set = list()
+    for i in range(1, len(data)):
+        if i % int(1 / factor) == 0:
+            val_set.append(data[i])
+        else:
+            train_set.append(data[i])
+    return train_set, val_set
+
+
+def classification_evaluate(network: NeuralNetwork, test_data, n_class):
     positives = 0
     predictions = list()
     for i in range(len(test_data)):
-        result = network.forward_propagation(test_data[i][0:input_size], activation, out_activation)
-        predicted = (2 if result[0] >= 1.5 else 1) if binary else np.argmax(result) + 1
+        result = network.forward_propagation(test_data[i][:input_size], activation, out_activation)
+        predicted = np.argmax(result) + 1
         actual = int(test_data[i][input_size])
         predictions.append(predicted)
         if predicted == actual:
@@ -49,70 +79,61 @@ def regression_evaluate(network: NeuralNetwork, test_data):
 
 
 if __name__ == "__main__":
+
     logging.basicConfig(filename=log_file_path, level=logging.INFO)
     logging.info('\nProgram started\n')
-    train_data_filename = "classification\\data.three_gauss.train.500.csv"
-    test_data_filename = "classification\\data.three_gauss.test.500.csv"
 
-    #train_data_filename = "regression\\data.activation.train.500.csv"
-    #test_data_filename = "regression\\data.activation.test.500.csv"
-    problem = 1
-    #problem = 2
-    val_set_factor = 0.2
+    # wybieramy rozmiar danych - wybierane są odpowiednie pliki
+    # oraz przydaje się do odpowiedniego ustawienia danych przy klasyfikacji do więcej niż 2 klas
+    samples_per_class = 500
+    train_data_filename = "classification\\data.simple.train."+str(samples_per_class)+".csv"
+    test_data_filename = "classification\\data.simple.test."+str(samples_per_class)+".csv"
+    have_to_mix = False
 
-    learning_factor = 0.1
+    problem = 1  # zgodnie z modes (patrz powyżej)
+    n_class = 2  # liczba klas w przypadku problemu klasyfikacji
+
+    iterations = 500  # iteracje uczenia
+    learning_factor = 1  # współczynnik uczenia
     input_size = 2
-    #input_size = 1
-    output_size = 3
-    #output_size = 1
+    output_size = n_class if problem == 1 else 1
 
     multi_class_fl = (problem == 1) & (output_size > 1)
 
-    activation = Activation.relu
-    derivative = Activation.relu_derivative
+    activation = Activation.sigmoid
+    derivative = Activation.sigmoid_derivative
     out_activation = Activation.softmax
     out_derivative = Activation.softmax_derivative
     cost_gradient = CostFunctions.MSE_gradient
-    loss_function = CostFunctions.MSE
 
-    network = NeuralNetwork(3, [input_size, 2, output_size])
-    Visualization.write_out_neural_network_params(network)
-    data = load_csv(train_data_filename)
-    if multi_class_fl:
-        for i in range(1, len(data)):
-            class_vector = np.zeros(output_size)
-            class_vector[int(data[i][input_size])-1] = 1
-            data[i] = data[i][0:input_size] + list(class_vector)
+    network = NeuralNetwork([input_size, 10, output_size])
 
-    train_set = list()
-    val_set = list()
-    for i in range(1, len(data)):
-        if i % int(1 / val_set_factor) == 0:
-            val_set.append(data[i])
-        else:
-            train_set.append(data[i])
+    #Visualization.write_out_neural_network_params(network)
 
-    network.learn(input_size, train_set, val_set, activation, out_activation, derivative, out_derivative,
-                  cost_gradient, loss_function, learning_factor)
-    Visualization.write_out_neural_network_params(network)
+    rdata = load_csv(train_data_filename)
+
+    if modes[problem] == "Classification":
+        data = modify_data_for_classification(rdata[1:], n_class, samples_per_class, have_to_mix)
+        data = modify_for_multiclass(data, n_class)
+    #train_set, val_set = split_dataset(data, val_set_factor)
+
+    network.learn(input_size, data, [], activation, out_activation, derivative, out_derivative,
+                  cost_gradient, learning_factor, iterations)
+
+    #Visualization.write_out_neural_network_params(network)
+
     test_data = load_csv(test_data_filename)
 
     if modes[problem] == "Classification":
-        Visualization.draw_2D_plot(data[1:], 'Training data [raw]')
-        positives = classification_evaluate(network, test_data[1:], output_size == 1)
+        Visualization.draw_2D_plot(rdata[1:], 'Training data [raw]')
 
+        positives = classification_evaluate(network, test_data[1:], n_class)
         total_accuracy = positives/(len(test_data)-1)
-        # precisions = [positives[i]/confusion_matrix[i].sum() for i in range(n)]
-        # recalls = [positives[i]/confusion_matrix[i].transpose().sum() for i in range(n)]
 
         print("Total accuracy:", total_accuracy)
-        # for i in range(n):
-        #     print("Precision_"+str(i+1), precisions[i])
-        #     print("Recall_" + str(i+1), recalls[i])
 
     if modes[problem] == "Regression":
         mean_square_error = regression_evaluate(network, test_data[1:])
-
         print("Mean square error:", mean_square_error)
 
 

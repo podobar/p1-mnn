@@ -5,9 +5,18 @@ import numpy as np
 class Activation:
 
     @staticmethod
-    def sigmoid(x):
+    def bin_sigmoid(x):
         x_norm = [min(xi, 10) for xi in x]
         return [math.exp(xi) / (math.exp(xi) + 1) + 1 for xi in x_norm]
+
+    @staticmethod
+    def bin_sigmoid_derivative(y):
+        return [(yi - 1) * (1 - yi + 1) for yi in y]
+
+    @staticmethod
+    def sigmoid(x):
+        x_norm = [min(xi, 10) for xi in x]
+        return [math.exp(xi) / (math.exp(xi) + 1) for xi in x_norm]
 
     @staticmethod
     def sigmoid_derivative(y):
@@ -15,7 +24,8 @@ class Activation:
 
     @staticmethod
     def tanH(x):
-        return [2/(1+math.exp(-2*xi)) - 1 for xi in x]
+        x_norm = [max(xi, -10) for xi in x]
+        return [2/(1+math.exp(-2*xi)) - 1 for xi in x_norm]
 
     @staticmethod
     def tanH_derivative(y):
