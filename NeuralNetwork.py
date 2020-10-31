@@ -61,7 +61,7 @@ class NeuralNetwork:
         self.Errors.clear()
         #Visualization.write_out_neural_network_weights(self)
 
-    def learn(self, input_size, train_set, val_set, inner_activate, out_activate, inner_derivative, out_derivative,
+    def learn(self, input_size, train_set, inner_activate, out_activate, inner_derivative, out_derivative,
               cost_gradient, learn_factor, iterations):
 
         bestW = list()
@@ -69,17 +69,17 @@ class NeuralNetwork:
         minloss = -1
 
         for i in range(iterations):
-            data = train_set[i]
+            data = train_set[i%len(train_set)]
             self.forward_propagation(data[0:input_size], inner_activate, out_activate)
             self.back_propagation_error(data[input_size:len(data)], inner_derivative, out_derivative, cost_gradient)
             self.update_weights(learn_factor)
 
-            actual = list()
-            predicted = list()
-            for val_data in val_set:
-                actual.append(val_data[input_size:len(data)])
-                predicted.append(self.forward_propagation(val_data[0:input_size], inner_activate, out_activate))
-
+            # actual = list()
+            # predicted = list()
+            # for val_data in val_set:
+            #     actual.append(val_data[input_size:len(data)])
+            #     predicted.append(self.forward_propagation(val_data[0:input_size], inner_activate, out_activate))
+        #
         #     loss = loss_function(actual, predicted)
         #     if (minloss == -1) | (minloss > loss):
         #         minloss = loss

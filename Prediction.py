@@ -2,11 +2,14 @@ from Activation import Activation
 from CostFunctions import CostFunctions
 from NeuralNetwork import NeuralNetwork
 from Visualization import Visualization
+from Scaler import Scaler
 import csv
 import numpy as np
 import logging
 
 modes = {1: "Classification", 2: "Regression"}
+scale_mode = {1: "std", 2: "norm", 3: "none"}
+
 log_file_path = "logs\\history.log"
 
 
@@ -20,6 +23,17 @@ def load_csv(filename):
 
     return _data
 
+
+def scale(data, scaler: Scaler, mode, rescaling):
+    if scale_mode[mode] == "std":
+        fun = scaler.standardize if not rescaling else scaler.unstandardize
+    else:
+        if scale_mode[mode] == "norm":
+            fun = scaler.normalize if not rescaling else scaler.unnormalize
+        else:
+            fun = Scaler.identity
+
+    return fun(data)
 
 def modify_for_multiclass(data, n_class):
     for i in range(len(data)):
@@ -39,6 +53,16 @@ def modify_data_for_classification(data, n_class, samples_per_class, have_to_mix
 
     return data_reordered
 
+def modify_data_for_regression(data, in_scaler, out_scaler):
+    inputs = [d[0] for d in data]
+    outputs = [d[1] for d in data]
+
+    in_scaler.fit(inputs)
+    out_scaler.fit(outputs)
+
+    data = [[scale(d[0], in_scaler, in_scaling, False), scale(d[1], out_scaler, out_scaling, False)]
+            for d in data]
+    return data, in_scaler, out_scaler
 
 def split_dataset(data, factor):
     train_set = list()
@@ -68,9 +92,11 @@ def classification_evaluate(network: NeuralNetwork, test_data, n_class):
 def regression_evaluate(network: NeuralNetwork, test_data):
     actuals = list()
     predictions = list()
+    test_data = [[d[0], scale(d[1], out_scaler, out_scaling, False)] for d in test_data]
     for i in range(len(test_data)):
-        result = network.forward_propagation(test_data[i][0:input_size], activation, out_activation)
-        actual = float(test_data[i][input_size])
+        input_data = scale(test_data[i][0], in_scaler, in_scaling, False)
+        result = network.forward_propagation(input_data, activation, out_activation)
+        actual = float(test_data[i][1])
         actuals.append(actual)
         predictions.append(result)
 
@@ -86,27 +112,31 @@ if __name__ == "__main__":
     # wybieramy rozmiar danych - wybierane są odpowiednie pliki
     # oraz przydaje się do odpowiedniego ustawienia danych przy klasyfikacji do więcej niż 2 klas
     samples_per_class = 500
-    train_data_filename = "classification\\data.simple.train."+str(samples_per_class)+".csv"
-    test_data_filename = "classification\\data.simple.test."+str(samples_per_class)+".csv"
+    train_data_filename = "regression\\data.activation.train."+str(samples_per_class)+".csv"
+    test_data_filename = "regression\\data.activation.test."+str(samples_per_class)+".csv"
     have_to_mix = False
 
-    problem = 1  # zgodnie z modes (patrz powyżej)
-    n_class = 2  # liczba klas w przypadku problemu klasyfikacji
+    problem = 2  # zgodnie z modes (patrz powyżej)
+    n_class = 4  # liczba klas w przypadku problemu klasyfikacji
 
-    iterations = 500  # iteracje uczenia
-    learning_factor = 1  # współczynnik uczenia
-    input_size = 2
+    iterations = 1000  # iteracje uczenia
+    learning_factor = 0.1  # współczynnik uczenia
+    input_size = 1
     output_size = n_class if problem == 1 else 1
 
     multi_class_fl = (problem == 1) & (output_size > 1)
 
-    activation = Activation.sigmoid
-    derivative = Activation.sigmoid_derivative
-    out_activation = Activation.softmax
-    out_derivative = Activation.softmax_derivative
-    cost_gradient = CostFunctions.MSE_gradient
+    network = NeuralNetwork([input_size, 4,  output_size])
+    in_scaler = Scaler()
+    out_scaler = Scaler()
 
-    network = NeuralNetwork([input_size, 10, output_size])
+    activation = Activation.tanH
+    derivative = Activation.tanH_derivative
+    out_activation = Activation.linear
+    out_derivative = Activation.linear_derivative
+    cost_gradient = CostFunctions.MSE_gradient
+    in_scaling = 1
+    out_scaling = 2
 
     #Visualization.write_out_neural_network_params(network)
 
@@ -115,12 +145,16 @@ if __name__ == "__main__":
     if modes[problem] == "Classification":
         data = modify_data_for_classification(rdata[1:], n_class, samples_per_class, have_to_mix)
         data = modify_for_multiclass(data, n_class)
-    #train_set, val_set = split_dataset(data, val_set_factor)
 
-    network.learn(input_size, data, [], activation, out_activation, derivative, out_derivative,
+    if modes[problem] == "Regression":
+        data, in_scaler, out_scaler = modify_data_for_regression(rdata[1:], in_scaler, out_scaler)
+
+    network.learn(input_size, data, activation, out_activation, derivative, out_derivative,
                   cost_gradient, learning_factor, iterations)
 
     #Visualization.write_out_neural_network_params(network)
+
+
 
     test_data = load_csv(test_data_filename)
 
