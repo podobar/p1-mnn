@@ -6,7 +6,7 @@ from Scaler import Scaler
 import csv
 import numpy as np
 import logging
-from mnist import MNIST
+from mlxtend.data import loadlocal_mnist
 
 modes = {1: "Classification", 2: "Regression"}
 scale_mode = {1: "std", 2: "norm", 3: "none"}
@@ -110,8 +110,10 @@ if __name__ == "__main__":
     logging.basicConfig(filename=log_file_path, level=logging.INFO)
     logging.info('\nProgram started\n')
 
-    mndata = MNIST('MNIST')
-    test_data_filename = "regression\\data.activation.test."+str(samples_per_class)+".csv"
+    train_X, train_y = loadlocal_mnist(
+        images_path='MNIST\\train-images.idx3-ubyte',
+        labels_path='MNIST\\train-labels.idx1-ubyte')
+
     have_to_mix = False
 
     problem = 2  # zgodnie z modes (patrz powyżej)
@@ -138,7 +140,7 @@ if __name__ == "__main__":
 
     #Visualization.write_out_neural_network_params(network)
 
-    rdata = load_csv(train_data_filename)
+
 
     if modes[problem] == "Classification":
         data = modify_data_for_classification(rdata[1:], n_class, samples_per_class, have_to_mix)
@@ -152,9 +154,9 @@ if __name__ == "__main__":
 
     #Visualization.write_out_neural_network_params(network)
 
-
-
-    test_data = load_csv(test_data_filename)
+    test_X, test_y = loadlocal_mnist(
+        images_path='MNIST\\t10k-images.idx3-ubyte',
+        labels_path='MNIST\\t10k-labels.idx1-ubyte')
 
     if modes[problem] == "Classification":
         Visualization.draw_2D_plot(rdata[1:], 'Training data [raw]')
