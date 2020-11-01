@@ -38,7 +38,7 @@ class NeuralNetwork:
         errors = np.multiply(errors, out_derivative(self.Layers[-1]))
         self.Errors.append(errors)
 
-        for i in range(len(self.Layers)-2, 0, -1):
+        for i in range(len(self.Layers) - 2, 0, -1):
             errors = list()
             for j in range(len(self.Layers[i])):
                 error = 0
@@ -69,7 +69,7 @@ class NeuralNetwork:
         minloss = -1
 
         for i in range(iterations):
-            data = train_set[i%len(train_set)]
+            data = train_set[i % len(train_set)]
             self.forward_propagation(data[0:input_size], inner_activate, out_activate)
             self.back_propagation_error(data[input_size:len(data)], inner_derivative, out_derivative, cost_gradient)
             self.update_weights(learn_factor)

@@ -6,6 +6,7 @@ from Scaler import Scaler
 import csv
 import numpy as np
 import logging
+from mnist import MNIST
 
 modes = {1: "Classification", 2: "Regression"}
 scale_mode = {1: "std", 2: "norm", 3: "none"}
@@ -109,10 +110,7 @@ if __name__ == "__main__":
     logging.basicConfig(filename=log_file_path, level=logging.INFO)
     logging.info('\nProgram started\n')
 
-    # wybieramy rozmiar danych - wybierane są odpowiednie pliki
-    # oraz przydaje się do odpowiedniego ustawienia danych przy klasyfikacji do więcej niż 2 klas
-    samples_per_class = 500
-    train_data_filename = "regression\\data.activation.train."+str(samples_per_class)+".csv"
+    mndata = MNIST('MNIST')
     test_data_filename = "regression\\data.activation.test."+str(samples_per_class)+".csv"
     have_to_mix = False
 
