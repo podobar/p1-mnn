@@ -154,8 +154,6 @@ if __name__ == "__main__":
 
     #Visualization.write_out_neural_network_params(network)
 
-
-
     test_data = load_csv(test_data_filename)
 
     if modes[problem] == "Classification":
