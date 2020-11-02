@@ -24,7 +24,7 @@ class NeuralNetwork:
 
         for i in range(len(self.Weights)):
             new_input = self.Weights[i].dot(self.Layers[i])
-            np.add(new_input, self.Biases[i])
+            new_input = np.add(new_input, self.Biases[i])
 
             f = out_activate if i == len(self.Weights) - 1 else inner_activate
             new_input = f(new_input)
@@ -69,23 +69,25 @@ class NeuralNetwork:
         minloss = -1
 
         for i in range(iterations):
-            data = train_set[i%len(train_set)]
-            self.forward_propagation(data[0:input_size], inner_activate, out_activate)
-            self.back_propagation_error(data[input_size:len(data)], inner_derivative, out_derivative, cost_gradient)
+            data = train_set[i % len(train_set)]
+            result = self.forward_propagation(data[:input_size], inner_activate, out_activate)
+            self.back_propagation_error(data[input_size:], inner_derivative, out_derivative, cost_gradient)
             self.update_weights(learn_factor)
 
+            feedback = self.forward_propagation(data[:input_size], inner_activate, out_activate)
+            feedback = feedback
             # actual = list()
             # predicted = list()
             # for val_data in val_set:
             #     actual.append(val_data[input_size:len(data)])
             #     predicted.append(self.forward_propagation(val_data[0:input_size], inner_activate, out_activate))
-        #
-        #     loss = loss_function(actual, predicted)
-        #     if (minloss == -1) | (minloss > loss):
-        #         minloss = loss
-        #         bestW = self.Weights
-        #         bestB = self.Biases
-        #
+            #
+            # loss = loss_function(actual, predicted)
+            # if (minloss == -1) | (minloss > loss):
+            #     minloss = loss
+            #     bestW = self.Weights
+            #     bestB = self.Biases
+
         # self.Weights = bestW
         # self.Biases = bestB
 

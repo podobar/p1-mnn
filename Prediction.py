@@ -112,28 +112,28 @@ if __name__ == "__main__":
     # wybieramy rozmiar danych - wybierane są odpowiednie pliki
     # oraz przydaje się do odpowiedniego ustawienia danych przy klasyfikacji do więcej niż 2 klas
     samples_per_class = 500
-    train_data_filename = "regression\\data.activation.train."+str(samples_per_class)+".csv"
-    test_data_filename = "regression\\data.activation.test."+str(samples_per_class)+".csv"
+    train_data_filename = "clasification1\\data.circles.train."+str(samples_per_class)+".csv"
+    test_data_filename = "clasification1\\data.circles.test."+str(samples_per_class)+".csv"
     have_to_mix = False
 
-    problem = 2  # zgodnie z modes (patrz powyżej)
+    problem = 1  # zgodnie z modes (patrz powyżej)
     n_class = 4  # liczba klas w przypadku problemu klasyfikacji
 
-    iterations = 1000  # iteracje uczenia
-    learning_factor = 0.1  # współczynnik uczenia
-    input_size = 1
+    iterations = 5000  # iteracje uczenia
+    learning_factor = 0.01  # współczynnik uczenia
+    input_size = 2
     output_size = n_class if problem == 1 else 1
 
     multi_class_fl = (problem == 1) & (output_size > 1)
 
-    network = NeuralNetwork([input_size, 4,  output_size])
+    network = NeuralNetwork([input_size, 4, 4, output_size])
     in_scaler = Scaler()
     out_scaler = Scaler()
 
-    activation = Activation.tanH
-    derivative = Activation.tanH_derivative
-    out_activation = Activation.linear
-    out_derivative = Activation.linear_derivative
+    activation = Activation.relu
+    derivative = Activation.relu_derivative
+    out_activation = Activation.sigmoid
+    out_derivative = Activation.sigmoid_derivative
     cost_gradient = CostFunctions.MSE_gradient
     in_scaling = 1
     out_scaling = 2
