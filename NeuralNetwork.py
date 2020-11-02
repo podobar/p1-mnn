@@ -1,6 +1,6 @@
 import numpy as np
-
 from Visualization import Visualization
+from Activation import Activation
 
 class NeuralNetwork:
 
@@ -46,6 +46,7 @@ class NeuralNetwork:
                     error += self.Weights[i][k][j] * self.Errors[-1][k]
                 errors.append(error)
 
+
             errors = np.multiply(errors, inner_derivative(self.Layers[i]))
             self.Errors.append(errors)
 
@@ -61,12 +62,15 @@ class NeuralNetwork:
         self.Errors.clear()
         #Visualization.write_out_neural_network_weights(self)
 
-    def learn(self, input_size, train_set, inner_activate, out_activate, inner_derivative, out_derivative,
-              cost_gradient, learn_factor, iterations):
+    def learn(self, input_size, data_set, inner_activate, out_activate, inner_derivative, out_derivative,
+              cost_gradient, cost, learn_factor, iterations):
 
-        bestW = list()
-        bestB = list()
-        minloss = -1
+        n = int(np.max([len(data_set) * 0.9, len(data_set) - 100]))
+        checkpoint_n = int(iterations * 0.01)
+        train_set = data_set[:n]
+        val_set = data_set[n:]
+
+        losses = list()
 
         for i in range(iterations):
             data = train_set[i % len(train_set)]
@@ -74,23 +78,16 @@ class NeuralNetwork:
             self.back_propagation_error(data[input_size:], inner_derivative, out_derivative, cost_gradient)
             self.update_weights(learn_factor)
 
-            feedback = self.forward_propagation(data[:input_size], inner_activate, out_activate)
-            feedback = feedback
-            # actual = list()
-            # predicted = list()
-            # for val_data in val_set:
-            #     actual.append(val_data[input_size:len(data)])
-            #     predicted.append(self.forward_propagation(val_data[0:input_size], inner_activate, out_activate))
-            #
-            # loss = loss_function(actual, predicted)
-            # if (minloss == -1) | (minloss > loss):
-            #     minloss = loss
-            #     bestW = self.Weights
-            #     bestB = self.Biases
+            if i % checkpoint_n == 0:
+                actual = list()
+                predicted = list()
+                for val_data in val_set:
+                    actual.append(val_data[input_size:len(data)])
+                    predicted.append(self.forward_propagation(val_data[0:input_size], inner_activate, out_activate))
 
-        # self.Weights = bestW
-        # self.Biases = bestB
+                losses.append([i, cost(actual, predicted)])
 
+        Visualization.draw_2D_loss_per_iteration(losses)
 
 
 

@@ -34,6 +34,16 @@ class Visualization:
         plt.show()
 
     @staticmethod
+    def draw_2D_loss_per_iteration(losses):
+        x = [row[0] for row in losses]
+        y = [row[1] for row in losses]
+        plt.plot(x,y)
+        plt.xlabel('Iterations')
+        plt.ylabel('Loss on val set')
+        plt.title(f'Loss:')
+        plt.show()
+
+    @staticmethod
     def draw_2D_plot(data, plot_title):
         x = [row[0] for row in data]
         y = [row[1] for row in data]
