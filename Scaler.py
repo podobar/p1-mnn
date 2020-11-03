@@ -24,7 +24,7 @@ class Scaler:
         return np.divide(np.subtract(vector, self.Min), self.Range)
 
     def unnormalize(self, vector):
-        return np.multiply(np.add(vector, np.min(vector)), self.Range)
+        return np.add(np.multiply(vector, self.Range), self.Min)
 
     @staticmethod
     def identity(vector):

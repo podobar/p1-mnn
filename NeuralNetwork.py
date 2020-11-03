@@ -65,7 +65,7 @@ class NeuralNetwork:
     def learn(self, input_size, data_set, inner_activate, out_activate, inner_derivative, out_derivative,
               cost_gradient, cost, learn_factor, iterations):
 
-        n = int(np.max([len(data_set) * 0.9, len(data_set) - 100]))
+        n = int(len(data_set) * 0.9)
         checkpoint_n = int(iterations * 0.01)
         train_set = data_set[:n]
         val_set = data_set[n:]
@@ -87,7 +87,7 @@ class NeuralNetwork:
 
                 losses.append([i, cost(actual, predicted)])
 
-        Visualization.draw_2D_loss_per_iteration(losses)
+        Visualization.draw_2D_loss_per_iteration(losses[2:])
 
 
 

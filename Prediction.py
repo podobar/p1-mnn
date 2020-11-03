@@ -113,17 +113,17 @@ if __name__ == "__main__":
 
     # wybieramy rozmiar danych - wybierane są odpowiednie pliki
     # oraz przydaje się do odpowiedniego ustawienia danych przy klasyfikacji do więcej niż 2 klas
-    samples_per_class = 500
-    train_data_filename = "classification\\data.three_gauss.train."+str(samples_per_class)+".csv"
-    test_data_filename = "classification\\data.three_gauss.test."+str(samples_per_class)+".csv"
-    have_to_mix = True
+    samples_per_class = 1000
+    train_data_filename = "regression\\data.activation.train."+str(samples_per_class)+".csv"
+    test_data_filename = "regression\\data.activation.test."+str(samples_per_class)+".csv"
+    have_to_mix = False
 
-    problem = 1  # zgodnie z modes (patrz powyżej)
+    problem = 2  # zgodnie z modes (patrz powyżej)
     n_class = 3  # liczba klas w przypadku problemu klasyfikacji
 
-    iterations = 4000  # iteracje uczenia
-    learning_factor = 0.05  # współczynnik uczenia
-    input_size = 2
+    iterations = 2000  # iteracje uczenia
+    learning_factor = 0.000001  # współczynnik uczenia
+    input_size = 1
     output_size = n_class if problem == 1 else 1
 
     multi_class_fl = (problem == 1) & (output_size > 1)
@@ -134,12 +134,12 @@ if __name__ == "__main__":
 
     activation = Activation.tanH
     derivative = Activation.tanH_derivative
-    out_activation = Activation.softmax
-    out_derivative = Activation.softmax_derivative
+    out_activation = Activation.linear
+    out_derivative = Activation.linear_derivative
     cost = CostFunctions.MSE
-    cost_gradient = CostFunctions.cross_entropy_gradient
-    in_scaling = 1
-    out_scaling = 2
+    cost_gradient = CostFunctions.kullback_gradient
+    in_scaling = 3
+    out_scaling = 1
 
     #Visualization.write_out_neural_network_params(network)
 
